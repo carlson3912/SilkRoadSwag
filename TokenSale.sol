@@ -44,13 +44,14 @@ contract TokenSale{
     function buyItem(uint256 item_id, address payable marketer, string memory delivery_instructions ) public payable{
         require (msg.value == cost);
         require (total_supply > 0);
+        require(tokenContract.balanceOf(address(this))  >= 5);
         total_supply -= 1;
         manufacturer.transfer(manufacturer_amount);
         designer.transfer(designer_amount);
         marketer.transfer(marketer_amount);
         uint256 profit = cost - manufacturer_amount - designer_amount - marketer_amount;
         daoAddress.transfer(profit);
-        require(tokenContract.balanceOf(address(this))  >= 5);
+        tokenContract.transfer(msg.sender, 5);
         emit Sale(item_id, delivery_instructions);
 
     }

@@ -1,5 +1,6 @@
 //Token Contract
 pragma solidity >=0.4.22 <0.9.0;
+import './SwagSale.sol';
 
 contract SilkToken{
     uint256 public totalSupply;
@@ -8,7 +9,8 @@ contract SilkToken{
     string public standard = "Silk Token v1.0";
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
-
+    uint8 decimals = 18;
+    address public daoAddress = 0xa608b4F7D4C95c54CFf0b54c8aFa41Dec838244c;
     event Transfer(
         address indexed _from,
         address indexed _to,
@@ -25,6 +27,12 @@ contract SilkToken{
         address _sender,
         uint256 _amount
     );
+
+
+    function setDaoAddress(address _daoAddress) public{
+        require (daoAddress == 0xa608b4F7D4C95c54CFf0b54c8aFa41Dec838244c);
+        daoAddress = _daoAddress;
+    }
 
     function transfer(address _to, uint256 _value) public returns (bool success){
         require(balanceOf[msg.sender] >= _value);
@@ -60,11 +68,20 @@ contract SilkToken{
         emit Burn(msg.sender, _value);
         return percentage;
     }
+
+    function castVote(uint256 value, SwagSale swagSale, address _from) public{
+        require(msg.sender == daoAddress);
+        require(balanceOf[_from] >= value);
+        balanceOf[_from] -= value;
+        balanceOf[address(swagSale)] += value;
+    }
     //initial supply goes to the message sender, but I will promptly transfer 90% of silk to the DAO
     constructor(uint256 _totalSupply) {
         balanceOf[msg.sender] = _totalSupply;
         totalSupply = _totalSupply;
     }
+
+
 
     
 
